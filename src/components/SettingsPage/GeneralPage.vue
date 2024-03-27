@@ -59,7 +59,23 @@
           file.
         </q-item-label>
       </q-item-section>
+
     </q-item>
+
+    <q-item tag="label">
+      <q-item-section side top>
+        <q-checkbox v-model="settingsStore.settings.general.updatesOnStartup" />
+      </q-item-section>
+
+      <q-item-section>
+        <q-item-label>Check for Updates on Launch</q-item-label>
+        <q-item-label caption>
+          If enabled, the application will check for updates when it launches.
+        </q-item-label>
+      </q-item-section>
+
+    </q-item>
+
     <q-item-label header>Network</q-item-label>
     <q-item tag="label">
       <q-item-section side top>

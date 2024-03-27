@@ -27,7 +27,7 @@ import {
   wipeParsedLogs,
 } from "./log-parser/file-parser";
 import { InitLogger, InitMeterData } from "./logger";
-import { getSettings, saveSettings } from "./util/app-settings";
+import { getSettings, resetSettings, saveSettings } from "./util/app-settings";
 import { mainFolder } from "./util/directories";
 import { saveScreenshot } from "./util/screenshot";
 import {
@@ -58,9 +58,10 @@ console.info = log.info.bind(log);
 
 const store = new Store();
 
-let prelauncherWindow: BrowserWindow | null,
-  mainWindow: BrowserWindow | null,
-  damageMeterWindow: BrowserWindow | null;
+let dialogWindow: BrowserWindow,
+    prelauncherWindow: BrowserWindow | null,
+    mainWindow: BrowserWindow | null,
+    damageMeterWindow: BrowserWindow | null;
 let tray = null;
 
 const appLockKey = { myKey: "loa-details" };
@@ -117,8 +118,6 @@ try {
   log.error(e);
 }
 
-appSettings.appVersion = app.getVersion();
-
 //We relaunch admin as early as possible to be smoother, as -relaunch parameter is set, admin won't be checked again later on
 adminRelauncher(
   appSettings.general.useRawSocket
@@ -150,12 +149,21 @@ void app.whenReady().then(() => {
 
   // Don't create prelauncher if debugging
   if (!process.env.DEBUGGING) {
-    prelauncherWindow = createPrelauncherWindow();
-    prelauncherWindow.on("show", () => {
-      checkForUpdates();
-    });
+
+    //We're not in dev mode, check for updates
+    if (appSettings?.general?.updatesOnStartup) {
+
+      prelauncherWindow = createPrelauncherWindow();
+      prelauncherWindow.on("show", () => {
+          checkForUpdates();
+      });
+
+    }
+
   } else {
+
     startApplication();
+
   }
 });
 
@@ -224,35 +232,70 @@ function startApplication() {
       },
     },
     {
-      label: "Reset Windows",
+      label: "Reset",
       submenu: [
         {
-          label: "Both",
-          click() {
-            damageMeterWindow?.setPosition(0, 0);
-            store.set("windows.damage_meter.X", 0);
-            store.set("windows.damage_meter.Y", 0);
-            mainWindow?.setPosition(0, 0);
-            store.set("windows.main.X", 0);
-            store.set("windows.main.Y", 0);
-          },
+          label: "Windows",
+          submenu: [
+            {
+              label: "Both",
+              click() {
+                damageMeterWindow?.setPosition(0, 0);
+                store.set("windows.damage_meter.X", 0);
+                store.set("windows.damage_meter.Y", 0);
+                mainWindow?.setPosition(0, 0);
+                store.set("windows.main.X", 0);
+                store.set("windows.main.Y", 0);
+              },
+            },
+            {
+              label: "Damage Meter",
+              click() {
+                damageMeterWindow?.setPosition(0, 0);
+                store.set("windows.damage_meter.X", 0);
+                store.set("windows.damage_meter.Y", 0);
+              },
+            },
+            {
+              label: "Main Window",
+              click() {
+                mainWindow?.setPosition(0, 0);
+                store.set("windows.main.X", 0);
+                store.set("windows.main.Y", 0);
+              },
+            },
+          ],
         },
         {
-          label: "Damage Meter",
+          label: "Settings",
           click() {
-            damageMeterWindow?.setPosition(0, 0);
-            store.set("windows.damage_meter.X", 0);
-            store.set("windows.damage_meter.Y", 0);
-          },
-        },
-        {
-          label: "Main Window",
-          click() {
-            mainWindow?.setPosition(0, 0);
-            store.set("windows.main.X", 0);
-            store.set("windows.main.Y", 0);
-          },
-        },
+
+            const options = {
+              type: "question",
+              buttons: ["Yes, Reset", "No, I changed my mind", "Cancel"],
+              title: "Reset",
+              message: "Are you sure you want to reset your settings?",
+              detail: "This is only recommended if you're having issues with the application. In most cases, this will fix any issues you might have.",
+              defaultId: 1,
+              cancelId: 2
+            };
+
+            void dialog.showMessageBox(dialogWindow, options)
+              .then((result) => {
+
+                if (result.response === 0) {
+
+                  resetSettings();
+
+                  app.relaunch();
+                  app.exit();
+
+                }
+
+              });
+
+          }
+        }
       ],
     },
     {

@@ -1,82 +1,68 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <div class="q-electron-drag app-bar">
-      <div>
-        <span class="gilroy-extra-bold">LOA</span>
-        <span class="gilroy-light"> DETAILS </span>
+      <div class="title-container">
+        <span class="gilroy-extra-bold">LOA<span class="gilroy-light"> DETAILS </span></span>
         <span style="font-size: 10px; margin-left: 4px">
           v{{ settingsStore.settings.appVersion }}
         </span>
       </div>
 
-      <q-space />
+      <div class="middle-bar">
+
+        <div class="middle-bar-sep"></div>
+
+          <!-- Home -->
+          <router-link :to="{ path: '/' }" custom v-slot="{ href, navigate }">
+            <div class="middle-bar-item q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle q-btn--actionable q-focusable q-hoverable q-btn--dense" :class="{ active: route.path === '/' }" :href="href"  @click="navigate">
+              <q-icon name="home" />
+              <q-tooltip>Home</q-tooltip>
+            </div>
+          </router-link>
+
+          <!-- Logs -->
+          <router-link :to="{ path: '/logs' }" custom v-slot="{ href, navigate }">
+            <div class="middle-bar-item q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle q-btn--actionable q-focusable q-hoverable q-btn--dense" :class="{ active: route.path === '/logs' }" :href="href" @click="navigate">
+              <q-icon name="query_stats" />
+              <q-tooltip>Logs</q-tooltip>
+            </div>
+          </router-link>
+
+          <!-- Settings -->
+          <router-link :to="{ path: '/settings' }" custom v-slot="{ href, navigate }">
+            <div class="middle-bar-item q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle q-btn--actionable q-focusable q-hoverable q-btn--dense" :class="{ active: route.path === '/settings' }" :href="href" @click="navigate">
+              <q-icon name="settings" />
+              <q-tooltip>Settings</q-tooltip>
+            </div>
+          </router-link>
+
+          <!-- Wiki -->
+          <div class="middle-bar-item q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle q-btn--actionable q-focusable q-hoverable q-btn--dense" @click="openWiki">
+            <q-icon name="fa-brands fa-github" />
+            <q-tooltip>Wiki</q-tooltip>
+          </div>
+
+          <!-- Discord -->
+          <div class="middle-bar-item q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle q-btn--actionable q-focusable q-hoverable q-btn--dense" @click="openDiscord">
+            <q-icon name="fa-brands fa-discord" />
+            <q-tooltip>Discord</q-tooltip>
+          </div>
+
+          <!-- Patreon -->
+          <div class="middle-bar-item patreon q-btn q-btn-item non-selectable no-outline q-btn--flat q-btn--rectangle q-btn--actionable q-focusable q-hoverable q-btn--dense" @click="openPatreon" style="margin-left: auto">
+            <q-icon name="fa-brands fa-patreon" style="color: #f1465a" />
+            <span>Support Us!</span>
+            <q-tooltip>Patreon</q-tooltip>
+          </div>
+
+      </div>
 
       <div class="right-bar">
         <q-btn dense flat icon="ti-minus" @click="minimize" />
         <q-btn dense flat icon="ti-control-stop" @click="toggleMaximize" />
         <q-btn dense flat icon="ti-close" @click="closeApp" />
       </div>
-    </div>
 
-    <div class="app-links q-pa-sm q-pl-md row items-center">
-      <router-link :to="{ path: '/' }" custom v-slot="{ href, navigate }">
-        <div
-          class="link-item q-ml-lg non-selectable"
-          :class="{ active: route.path === '/' }"
-          :href="href"
-          @click="navigate"
-        >
-          <q-icon name="home" />
-          Home
-        </div>
-      </router-link>
-
-      <router-link :to="{ path: '/logs' }" custom v-slot="{ href, navigate }">
-        <div
-          class="link-item q-ml-lg non-selectable"
-          :class="{ active: route.path === '/logs' }"
-          :href="href"
-          @click="navigate"
-        >
-          <q-icon name="query_stats" />
-          Logs
-        </div>
-      </router-link>
-
-      <router-link
-        :to="{ path: '/settings' }"
-        custom
-        v-slot="{ href, navigate }"
-      >
-        <div
-          class="link-item q-ml-lg non-selectable"
-          :class="{ active: route.path === '/settings' }"
-          :href="href"
-          @click="navigate"
-        >
-          <q-icon name="settings" />
-          Settings
-        </div>
-      </router-link>
-
-      <div class="link-item q-ml-lg non-selectable" @click="openWiki">
-        <q-icon name="fa-brands fa-github" />
-        Wiki
-      </div>
-
-      <div class="link-item q-ml-lg non-selectable" @click="openDiscord">
-        <q-icon name="fa-brands fa-discord" />
-        Discord
-      </div>
-
-      <div
-        class="link-item q-ml-lg non-selectable"
-        @click="openPatreon"
-        style="margin-left: auto"
-      >
-        <q-icon name="fa-brands fa-patreon" style="color: #f1465a" />
-        Support us on Patreon!
-      </div>
     </div>
 
     <div class="q-page-container">

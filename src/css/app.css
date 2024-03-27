@@ -22,3 +22,39 @@
 .gilroy-extra-bold {
   font-family: "gilroy extra bold";
 }
+
+.title-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+}
+
+.middle-bar {
+  flex: 1;
+  display: flex;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+  .middle-bar-sep {
+    border-right: solid rgb(51, 54, 57) 1px;
+  }
+  .middle-bar-item {
+    display: flex;
+    padding: 0 5px;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+    .middle-bar-item.patreon {
+      display: flex;
+      flex-direction: row;
+      align-content: center;
+      flex-wrap: nowrap;
+      justify-content: center;
+      align-items: center;
+    }
+      .middle-bar-item.patreon > span {
+        padding-left: 5px;
+      }

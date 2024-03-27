@@ -14,6 +14,7 @@ export const useSettingsStore = defineStore("settings", {
         startMainMinimized: false,
         closeToSystemTray: true,
         saveScreenshots: true,
+        updatesOnStartup: false,
         server: "steam",
         customLogPath: null,
         useRawSocket: false,

@@ -4,40 +4,62 @@ import { StatusEffectBuffTypeFlags } from "meter-core/logger/data";
 import { classes } from "src/constants/classes";
 import { merge } from "lodash"; //TODO: when we rework, remove lodash (required for merge)
 import { randomUUID } from "crypto";
+import { app } from "electron";
 
 const store = new Store();
 
+export function resetSettings() {
+  try {
+
+    const settings = structuredClone(defaultSettings);
+    settings.clientId = randomUUID();
+    saveSettings(settings);
+
+    log.info("Reset settings.");
+
+  } catch (e) {
+    log.info("Settings reset failed: " + (e as string));
+  }
+}
+
 export function getSettings() {
-  const appSettings = structuredClone(defaultSettings);
 
   try {
-    const settingsStr = store.get("settings");
 
+    const appSettings = structuredClone(defaultSettings);
+    const settingsStr = store.get("settings");
     if (typeof settingsStr === "object")
       merge(appSettings, structuredClone(settingsStr));
     else if (typeof settingsStr === "string")
       merge(appSettings, JSON.parse(settingsStr));
 
+
+    if (appSettings.appVersion === "" || appSettings.clientId === "") {
+      if (appSettings.appVersion === "")
+        appSettings.appVersion = app.getVersion();
+      if (appSettings.clientId === "")
+        appSettings.clientId = randomUUID();
+      saveSettings(appSettings);
+    }
+
+    for (const k in appSettings.damageMeter.classes) {
+      if (!(k in classes))
+        delete appSettings.damageMeter.classes[k];
+    }
+    for (const k in appSettings.damageMeter.tabs) {
+      if (!(k in defaultSettings.damageMeter.tabs))
+        delete appSettings.damageMeter.tabs[k];
+    }
+
     log.info("Found and applied settings.");
+
+    return appSettings;
+
   } catch (e) {
-    log.info("Setting retrieval failed: " + (e as string));
+    log.info("Setting retrieval failed, returning default: " + (e as string));
+    return structuredClone(defaultSettings);
   }
 
-  // Cleanup settings for unused data
-  for (const k in appSettings.damageMeter.classes) {
-    if (!(k in classes)) delete appSettings.damageMeter.classes[k];
-  }
-  for (const k in appSettings.damageMeter.tabs) {
-    if (!(k in defaultSettings.damageMeter.tabs))
-      delete appSettings.damageMeter.tabs[k];
-  }
-
-  // Create clientId
-  if (appSettings.clientId === "") {
-    appSettings.clientId = randomUUID();
-    saveSettings(appSettings);
-  }
-  return appSettings;
 }
 
 export function saveSettings(settings: Settings | string) {
@@ -57,6 +79,7 @@ export type Settings = {
     startMainMinimized: boolean;
     closeToSystemTray: boolean;
     saveScreenshots: boolean;
+    updatesOnStartup: boolean;
     server: "steam" | "kr" | "ru";
     customLogPath: string | null;
     useRawSocket: boolean;
@@ -148,6 +171,7 @@ const defaultSettings: Settings = {
     startMainMinimized: false,
     closeToSystemTray: true,
     saveScreenshots: true,
+    updatesOnStartup: false,
     server: "steam",
     customLogPath: null,
     useRawSocket: false,
